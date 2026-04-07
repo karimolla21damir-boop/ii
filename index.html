@@ -225,7 +225,7 @@
   #modal-box::-webkit-scrollbar-track { background: rgba(0, 20, 50, 0.5); }
   #modal-box::-webkit-scrollbar-thumb { background: rgba(0, 150, 255, 0.3); border-radius: 3px; }
 
-  /* ---------- Coordinate helper (enable for fine-tuning) ---------- */
+  /* ---------- Debug coordinate helper ---------- */
   #coord-display {
     position: fixed;
     bottom: 10px;
@@ -238,8 +238,7 @@
     padding: 6px 10px;
     border-radius: 4px;
     pointer-events: none;
-    /* Change to display:block to enable coordinate helper */
-    display: none;
+    display: none; /* Change to block to enable */
   }
 </style>
 </head>
@@ -255,7 +254,6 @@
 <div id="page-container">
   <img id="human-figure" src="materials/human.png" alt="Human Body">
 
-  <!-- SVG Lines -->
   <svg id="lines-svg" xmlns="http://www.w3.org/2000/svg">
     <line id="line-brain"/><circle class="dot-end" id="dot-brain" r="5"/>
     <line id="line-tongue"/><circle class="dot-end" id="dot-tongue" r="5"/>
@@ -264,7 +262,6 @@
     <line id="line-bone"/><circle class="dot-end" id="dot-bone" r="5"/>
   </svg>
 
-  <!-- Buttons -->
   <button class="organ-btn" id="btn-brain"  data-organ="brain"  data-file="materials/brain.txt">Brain</button>
   <button class="organ-btn" id="btn-tongue" data-organ="tongue" data-file="materials/tongue.txt">Tongue</button>
   <button class="organ-btn" id="btn-heart"  data-organ="heart"  data-file="materials/heart.txt">Heart</button>
@@ -282,7 +279,6 @@
   </div>
 </div>
 
-<!-- Coordinate helper -->
 <div id="coord-display"></div>
 
 <!-- ======================== JAVASCRIPT ======================== -->
@@ -299,51 +295,55 @@
   var coordDisplay = document.getElementById('coord-display');
 
   /* ===========================================================
-   *  ORGAN DOT TARGETS — % of the human figure image
+   *  NEW APPROACH: Use viewport-fraction positioning for dots.
    *
-   *  Calibrated using brain (confirmed correct) as anchor.
-   *  Brain at {0.47, 0.19} renders at viewport ~(720, 195)
-   *  → Derived image rect: left≈530, top≈63, width≈440, height≈692
+   *  Your exact pixel coordinates (from 1920x1080 full screen):
+   *    Brain:  already correct (keeping as image %)
+   *    Heart:  (990, 727)  → viewport-relative: (990, 667)
+   *    Vessel: (925, 572)  → viewport-relative: (925, 512)
+   *    Tongue: (866, 422)  → viewport-relative: (866, 362)
+   *    Bone:   (739, 756)  → viewport-relative: (739, 696)
    *
-   *  Tongue (mouth):           viewport (660, 260) → img (0.295, 0.285)
-   *  Heart (glowing center):   viewport (790, 570) → img (0.591, 0.732)
-   *  Blood Vessel (neck area): viewport (720, 345) → img (0.432, 0.407)
-   *  Bone (right shoulder):    viewport (940, 395) → img (0.932, 0.480)
+   *  Chrome offset ≈ 60px top.
+   *  Viewport: 1920 x 728
+   *
+   *  As viewport fractions:
+   *    Heart:  (990/1920, 667/728) = (0.5156, 0.9162)
+   *    Vessel: (925/1920, 512/728) = (0.4818, 0.7033)
+   *    Tongue: (866/1920, 362/728) = (0.4510, 0.4973)
+   *    Bone:   (739/1920, 696/728) = (0.3849, 0.9560)
    * =========================================================== */
 
-  var organTargets = {
-    brain:  { x: 0.47,  y: 0.19  },
-    tongue: { x: 0.295, y: 0.285 },
-    heart:  { x: 0.591, y: 0.732 },
-    vessel: { x: 0.432, y: 0.407 },
-    bone:   { x: 0.932, y: 0.480 }
+  /* Viewport-fraction targets (vx, vy as fraction of viewport width/height) */
+  var vpTargets = {
+    brain:  null,  /* brain uses image-% method since it's already correct */
+    heart:  { vx: 0.5156, vy: 0.9162 },
+    vessel: { vx: 0.4818, vy: 0.7033 },
+    tongue: { vx: 0.4510, vy: 0.4973 },
+    bone:   { vx: 0.3849, vy: 0.9560 }
   };
 
-  /* ===========================================================
-   *  BUTTON POSITIONS
-   *  side:   'left' or 'right' of viewport
-   *  yPct:   vertical center of button as fraction of viewport height
-   *  margin: px from viewport edge
-   * =========================================================== */
+  /* Brain stays with image-% (confirmed working) */
+  var brainImgTarget = { x: 0.47, y: 0.19 };
 
   var buttonLayout = {
-    brain:  { side: 'right', yPct: 0.230, margin: 30 },
-    tongue: { side: 'left',  yPct: 0.320, margin: 20 },
-    heart:  { side: 'right', yPct: 0.420, margin: 30 },
-    vessel: { side: 'left',  yPct: 0.545, margin: 20 },
-    bone:   { side: 'right', yPct: 0.650, margin: 30 }
+    brain:  { side: 'right', yPct: 0.160, margin: 30 },
+    tongue: { side: 'left',  yPct: 0.400, margin: 20 },
+    heart:  { side: 'right', yPct: 0.540, margin: 30 },
+    vessel: { side: 'left',  yPct: 0.650, margin: 20 },
+    bone:   { side: 'right', yPct: 0.830, margin: 30 }
   };
 
-  /* -------- Core update function -------- */
+  /* -------- Core update -------- */
   function updateAll() {
     var imgRect = humanFigure.getBoundingClientRect();
+    var vw = window.innerWidth;
     var vh = window.innerHeight;
 
     organButtons.forEach(function(btn) {
       var organ  = btn.dataset.organ;
       var layout = buttonLayout[organ];
-      var target = organTargets[organ];
-      if (!layout || !target) return;
+      if (!layout) return;
 
       /* Position button */
       var btnH = btn.offsetHeight;
@@ -358,7 +358,7 @@
         btn.style.right = 'auto';
       }
 
-      /* Line start: inner edge of button facing the body */
+      /* Line start: inner edge of button */
       var btnRect = btn.getBoundingClientRect();
       var bx, by;
       by = btnRect.top + btnRect.height / 2;
@@ -368,11 +368,20 @@
         bx = btnRect.right;
       }
 
-      /* Target organ dot on the image */
-      var tx = imgRect.left + imgRect.width  * target.x;
-      var ty = imgRect.top  + imgRect.height * target.y;
+      /* Target dot position */
+      var tx, ty;
 
-      /* Update SVG */
+      if (organ === 'brain') {
+        /* Brain uses image-relative % */
+        tx = imgRect.left + imgRect.width  * brainImgTarget.x;
+        ty = imgRect.top  + imgRect.height * brainImgTarget.y;
+      } else {
+        /* All others use viewport-fraction from your exact pixel measurements */
+        var vpt = vpTargets[organ];
+        tx = vw * vpt.vx;
+        ty = vh * vpt.vy;
+      }
+
       var line = document.getElementById('line-' + organ);
       var dot  = document.getElementById('dot-'  + organ);
 
@@ -389,7 +398,7 @@
     });
   }
 
-  /* -------- Initialize -------- */
+  /* -------- Init -------- */
   function init() {
     updateAll();
     var count = 0;
@@ -404,30 +413,24 @@
   window.addEventListener('load', init);
   if (humanFigure.complete) setTimeout(init, 30);
 
-  /* -------- Coordinate helper --------
-   * Enable by changing #coord-display to display:block in CSS.
-   * Hover over the image to see exact img % coordinates.
-   * Use those values to adjust organTargets.
-   */
+  /* -------- Coordinate helper -------- */
   document.addEventListener('mousemove', function(e) {
-    if (coordDisplay.style.display === 'none' &&
-        getComputedStyle(coordDisplay).display === 'none') return;
+    if (getComputedStyle(coordDisplay).display === 'none') return;
     var imgRect = humanFigure.getBoundingClientRect();
-    var rx = ((e.clientX - imgRect.left) / imgRect.width).toFixed(3);
-    var ry = ((e.clientY - imgRect.top)  / imgRect.height).toFixed(3);
+    var vw = window.innerWidth;
+    var vh = window.innerHeight;
     coordDisplay.textContent =
-      'viewport: (' + e.clientX + ', ' + e.clientY + ')  |  ' +
-      'img %: { x: ' + rx + ', y: ' + ry + ' }  |  ' +
-      'imgRect: L' + Math.round(imgRect.left) + ' T' + Math.round(imgRect.top) +
-      ' W' + Math.round(imgRect.width) + ' H' + Math.round(imgRect.height);
+      'screen: (' + e.clientX + ', ' + e.clientY + ')  |  ' +
+      'vp%: { vx: ' + (e.clientX/vw).toFixed(4) + ', vy: ' + (e.clientY/vh).toFixed(4) + ' }  |  ' +
+      'img%: { x: ' + ((e.clientX - imgRect.left)/imgRect.width).toFixed(3) +
+      ', y: ' + ((e.clientY - imgRect.top)/imgRect.height).toFixed(3) + ' }';
   });
 
-  /* -------- Button Click → Fetch text & show modal -------- */
+  /* -------- Modal -------- */
   organButtons.forEach(function(btn) {
     btn.addEventListener('click', function() {
       var file  = btn.dataset.file;
       var title = btn.textContent;
-
       modalTitle.textContent   = title;
       modalContent.textContent = '';
       modalLoading.classList.add('show');
@@ -449,10 +452,7 @@
     });
   });
 
-  /* -------- Close modal -------- */
-  modalClose.addEventListener('click', function() {
-    modalOverlay.classList.remove('active');
-  });
+  modalClose.addEventListener('click', function() { modalOverlay.classList.remove('active'); });
   modalOverlay.addEventListener('click', function(e) {
     if (e.target === modalOverlay) modalOverlay.classList.remove('active');
   });
