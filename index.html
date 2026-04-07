@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Human Body Interactive</title>
+<title>Мағжан Жұмабаев</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -50,6 +50,29 @@
     overflow: hidden;
   }
 
+  #page-container::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-image:
+      radial-gradient(1px 1px at 10% 20%, rgba(0,180,255,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 30% 65%, rgba(0,180,255,0.2) 0%, transparent 100%),
+      radial-gradient(1px 1px at 55% 15%, rgba(0,200,255,0.25) 0%, transparent 100%),
+      radial-gradient(1px 1px at 70% 80%, rgba(0,180,255,0.2) 0%, transparent 100%),
+      radial-gradient(1px 1px at 85% 40%, rgba(0,200,255,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 15% 85%, rgba(0,180,255,0.15) 0%, transparent 100%),
+      radial-gradient(1px 1px at 90% 10%, rgba(0,200,255,0.2) 0%, transparent 100%);
+    z-index: 1;
+    pointer-events: none;
+    animation: particleDrift 12s ease-in-out infinite alternate;
+  }
+
+  @keyframes particleDrift {
+    0% { opacity: 0.4; transform: translateY(0); }
+    100% { opacity: 0.8; transform: translateY(-8px); }
+  }
+
   #human-figure {
     position: absolute;
     top: 50%;
@@ -59,7 +82,7 @@
     width: auto;
     object-fit: contain;
     display: block;
-    filter: drop-shadow(0 0 30px rgba(0, 150, 255, 0.15));
+    filter: drop-shadow(0 0 40px rgba(0, 150, 255, 0.12)) drop-shadow(0 0 80px rgba(0, 100, 220, 0.06));
     z-index: 2;
     pointer-events: none;
   }
@@ -73,21 +96,27 @@
   }
 
   #lines-svg line {
-    stroke: rgba(0, 180, 255, 0.5);
-    stroke-width: 1.5;
-    filter: drop-shadow(0 0 4px rgba(0, 180, 255, 0.6));
+    stroke: rgba(0, 180, 255, 0.45);
+    stroke-width: 1.2;
+    filter: drop-shadow(0 0 4px rgba(0, 180, 255, 0.5));
   }
 
   #lines-svg circle.dot-end {
-    fill: rgba(0, 200, 255, 0.8);
-    filter: drop-shadow(0 0 5px rgba(0, 200, 255, 0.9));
+    fill: rgba(0, 200, 255, 0.85);
+    filter: drop-shadow(0 0 6px rgba(0, 200, 255, 0.9));
+    animation: dotPulse 2.5s ease-in-out infinite;
+  }
+
+  @keyframes dotPulse {
+    0%, 100% { r: 5; opacity: 0.85; }
+    50% { r: 7; opacity: 1; }
   }
 
   .organ-btn {
     position: absolute;
     z-index: 4;
-    background: rgba(0, 20, 50, 0.7);
-    border: 1px solid rgba(0, 180, 255, 0.45);
+    background: rgba(0, 20, 50, 0.65);
+    border: 1px solid rgba(0, 180, 255, 0.4);
     color: #b0dcff;
     font-family: 'Orbitron', sans-serif;
     font-size: 16px;
@@ -98,23 +127,39 @@
     border-radius: 6px;
     cursor: pointer;
     white-space: nowrap;
-    transition: all 0.3s ease;
-    box-shadow: 0 0 12px rgba(0, 150, 255, 0.15), inset 0 0 10px rgba(0, 150, 255, 0.05);
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
+    transition: all 0.35s ease;
+    box-shadow: 0 0 12px rgba(0, 150, 255, 0.12), inset 0 0 10px rgba(0, 150, 255, 0.04);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
   }
 
   .organ-btn:hover {
-    background: rgba(0, 60, 120, 0.75);
-    border-color: rgba(0, 210, 255, 0.8);
+    background: rgba(0, 60, 120, 0.7);
+    border-color: rgba(0, 210, 255, 0.85);
     color: #ffffff;
-    box-shadow: 0 0 22px rgba(0, 180, 255, 0.4), inset 0 0 12px rgba(0, 180, 255, 0.1);
-    transform: scale(1.07);
-    text-shadow: 0 0 8px rgba(0, 200, 255, 0.6);
+    box-shadow: 0 0 25px rgba(0, 180, 255, 0.35), inset 0 0 14px rgba(0, 180, 255, 0.08);
+    transform: scale(1.08);
+    text-shadow: 0 0 10px rgba(0, 200, 255, 0.5);
   }
 
   .organ-btn:active {
     transform: scale(0.97);
+  }
+
+  #page-title {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: rgba(0, 200, 255, 0.35);
+    z-index: 5;
+    pointer-events: none;
+    text-shadow: 0 0 25px rgba(0, 150, 255, 0.15);
   }
 
   #modal-overlay {
@@ -155,6 +200,17 @@
 
   #modal-overlay.active #modal-box {
     transform: translateY(0) scale(1);
+  }
+
+  #modal-box::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 60%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(0, 180, 255, 0.5), transparent);
+    border-radius: 2px;
   }
 
   #modal-title {
@@ -243,18 +299,18 @@
 </video>
 
 <div id="page-container">
+  <div id="page-title">Мағжан Жұмабаев</div>
+
   <img id="human-figure" src="materials/human.png" alt="Human Body">
 
   <svg id="lines-svg" xmlns="http://www.w3.org/2000/svg">
     <line id="line-brain"/><circle class="dot-end" id="dot-brain" r="5"/>
-    <line id="line-tongue"/><circle class="dot-end" id="dot-tongue" r="5"/>
     <line id="line-heart"/><circle class="dot-end" id="dot-heart" r="5"/>
     <line id="line-vessel"/><circle class="dot-end" id="dot-vessel" r="5"/>
     <line id="line-bone"/><circle class="dot-end" id="dot-bone" r="5"/>
   </svg>
 
   <button class="organ-btn" id="btn-brain"  data-organ="brain"  data-file="materials/brain.txt">МИ</button>
-  <button class="organ-btn" id="btn-tongue" data-organ="tongue" data-file="materials/tongue.txt">ТІЛ</button>
   <button class="organ-btn" id="btn-heart"  data-organ="heart"  data-file="materials/heart.txt">ЖҮРЕК</button>
   <button class="organ-btn" id="btn-vessel" data-organ="vessel" data-file="materials/vessel.txt">ҚАН ТАМЫРЛАР</button>
   <button class="organ-btn" id="btn-bone"   data-organ="bone"   data-file="materials/bone.txt">СҮЙЕК</button>
@@ -281,7 +337,6 @@
   var organButtons = document.querySelectorAll('.organ-btn');
   var bgVideo      = document.getElementById('bg-video');
 
-  /* Force video to loop at exactly 7.9 seconds */
   bgVideo.addEventListener('timeupdate', function() {
     if (bgVideo.currentTime >= 7.9) {
       bgVideo.currentTime = 0;
@@ -291,7 +346,6 @@
 
   var dotPositions = {
     brain:  { xPct: 0.4990, yPct: 0.2093 },
-    tongue: { xPct: 0.4443, yPct: 0.3528 },
     heart:  { xPct: 0.5141, yPct: 0.6833 },
     vessel: { xPct: 0.4766, yPct: 0.4824 },
     bone:   { xPct: 0.3703, yPct: 0.6852 }
@@ -299,10 +353,9 @@
 
   var buttonLayout = {
     brain:  { side: 'right', yPct: 0.152, margin: 260 },
-    tongue: { side: 'left',  yPct: 0.300, margin: 150 },
-    heart:  { side: 'right', yPct: 0.500, margin: 260 },
-    vessel: { side: 'left',  yPct: 0.430, margin: 150 },
-    bone:   { side: 'left',  yPct: 0.680, margin: 150 }
+    heart:  { side: 'right', yPct: 0.460, margin: 260 },
+    vessel: { side: 'left',  yPct: 0.380, margin: 150 },
+    bone:   { side: 'left',  yPct: 0.620, margin: 150 }
   };
 
   function updateAll() {
