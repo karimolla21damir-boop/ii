@@ -42,34 +42,27 @@
     pointer-events: none;
   }
 
-  /* ---------- Main Container ---------- */
-  #main-container {
-    position: relative;
-    width: 100%;
-    height: 100%;
+  /* ---------- Full Page Container for buttons + lines ---------- */
+  #page-container {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
     z-index: 2;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  /* ---------- Body Wrapper (relative anchor for buttons) ---------- */
-  #body-wrapper {
-    position: relative;
-    height: 90vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    overflow: hidden;
   }
 
   /* ---------- Human Figure ---------- */
   #human-figure {
-    height: 100%;
-    max-height: 90vh;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    height: 92vh;
     width: auto;
     object-fit: contain;
     display: block;
     filter: drop-shadow(0 0 30px rgba(0, 150, 255, 0.15));
+    z-index: 2;
   }
 
   /* ---------- SVG Lines Layer ---------- */
@@ -85,7 +78,6 @@
     stroke: rgba(0, 180, 255, 0.5);
     stroke-width: 1.5;
     filter: drop-shadow(0 0 4px rgba(0, 180, 255, 0.6));
-    transition: stroke 0.3s ease, stroke-width 0.3s ease;
   }
 
   #lines-svg circle.dot-end {
@@ -125,32 +117,6 @@
 
   .organ-btn:active {
     transform: scale(0.97);
-  }
-
-  /* ---------- Button Positions (% based relative to body-wrapper) ---------- */
-  #btn-brain {
-    top: 3%;
-    right: -160px;
-  }
-
-  #btn-tongue {
-    top: 14%;
-    left: -160px;
-  }
-
-  #btn-heart {
-    top: 32%;
-    right: -160px;
-  }
-
-  #btn-vessel {
-    top: 48%;
-    left: -160px;
-  }
-
-  #btn-bone {
-    top: 68%;
-    right: -160px;
   }
 
   /* ---------- Modal Overlay ---------- */
@@ -279,43 +245,6 @@
     background: rgba(0, 150, 255, 0.3);
     border-radius: 3px;
   }
-
-  /* ---------- Responsive Adjustments ---------- */
-  @media (max-width: 900px) {
-    .organ-btn {
-      font-size: 11px;
-      padding: 6px 12px;
-    }
-    #btn-brain { right: -130px; }
-    #btn-tongue { left: -130px; }
-    #btn-heart { right: -130px; }
-    #btn-vessel { left: -130px; }
-    #btn-bone { right: -130px; }
-  }
-
-  @media (max-width: 650px) {
-    #body-wrapper {
-      height: 70vh;
-    }
-    .organ-btn {
-      font-size: 10px;
-      padding: 5px 10px;
-    }
-    #btn-brain { right: -110px; }
-    #btn-tongue { left: -110px; }
-    #btn-heart { right: -110px; }
-    #btn-vessel { left: -110px; }
-    #btn-bone { right: -110px; }
-    #modal-box {
-      padding: 22px 20px;
-    }
-    #modal-title {
-      font-size: 18px;
-    }
-    #modal-content {
-      font-size: 13px;
-    }
-  }
 </style>
 </head>
 <body>
@@ -328,48 +257,38 @@
   <source src="materials/background.mp4" type="video/mp4">
 </video>
 
-<!-- ======================== MAIN CONTAINER ======================== -->
-<div id="main-container">
+<!-- ======================== PAGE CONTAINER ======================== -->
+<div id="page-container">
 
-  <!-- ====== Body Wrapper (relative positioning anchor) ====== -->
-  <div id="body-wrapper">
+  <!-- Human Figure Image -->
+  <img id="human-figure" src="materials/human.png" alt="Human Body">
 
-    <!-- Human Figure Image -->
-    <img id="human-figure" src="materials/human.png" alt="Human Body">
+  <!-- SVG Lines connecting buttons to organ locations -->
+  <svg id="lines-svg" xmlns="http://www.w3.org/2000/svg">
+    <line id="line-brain" x1="0" y1="0" x2="0" y2="0"/>
+    <circle class="dot-end" id="dot-brain" cx="0" cy="0" r="4"/>
 
-    <!-- SVG Lines connecting buttons to organ locations -->
-    <svg id="lines-svg" xmlns="http://www.w3.org/2000/svg">
-      <!-- Brain line -->
-      <line id="line-brain" x1="0" y1="0" x2="0" y2="0"/>
-      <circle class="dot-end" id="dot-brain" cx="0" cy="0" r="4"/>
+    <line id="line-tongue" x1="0" y1="0" x2="0" y2="0"/>
+    <circle class="dot-end" id="dot-tongue" cx="0" cy="0" r="4"/>
 
-      <!-- Tongue line -->
-      <line id="line-tongue" x1="0" y1="0" x2="0" y2="0"/>
-      <circle class="dot-end" id="dot-tongue" cx="0" cy="0" r="4"/>
+    <line id="line-heart" x1="0" y1="0" x2="0" y2="0"/>
+    <circle class="dot-end" id="dot-heart" cx="0" cy="0" r="4"/>
 
-      <!-- Heart line -->
-      <line id="line-heart" x1="0" y1="0" x2="0" y2="0"/>
-      <circle class="dot-end" id="dot-heart" cx="0" cy="0" r="4"/>
+    <line id="line-vessel" x1="0" y1="0" x2="0" y2="0"/>
+    <circle class="dot-end" id="dot-vessel" cx="0" cy="0" r="4"/>
 
-      <!-- Vessel line -->
-      <line id="line-vessel" x1="0" y1="0" x2="0" y2="0"/>
-      <circle class="dot-end" id="dot-vessel" cx="0" cy="0" r="4"/>
+    <line id="line-bone" x1="0" y1="0" x2="0" y2="0"/>
+    <circle class="dot-end" id="dot-bone" cx="0" cy="0" r="4"/>
+  </svg>
 
-      <!-- Bone line -->
-      <line id="line-bone" x1="0" y1="0" x2="0" y2="0"/>
-      <circle class="dot-end" id="dot-bone" cx="0" cy="0" r="4"/>
-    </svg>
+  <!-- Interactive Organ Buttons -->
+  <button class="organ-btn" id="btn-brain" data-organ="brain" data-file="materials/brain.txt">Brain</button>
+  <button class="organ-btn" id="btn-tongue" data-organ="tongue" data-file="materials/tongue.txt">Tongue</button>
+  <button class="organ-btn" id="btn-heart" data-organ="heart" data-file="materials/heart.txt">Heart</button>
+  <button class="organ-btn" id="btn-vessel" data-organ="vessel" data-file="materials/vessel.txt">Blood Vessel</button>
+  <button class="organ-btn" id="btn-bone" data-organ="bone" data-file="materials/bone.txt">Bone</button>
 
-    <!-- Interactive Organ Buttons -->
-    <button class="organ-btn" id="btn-brain" data-organ="brain" data-file="materials/brain.txt">Brain</button>
-    <button class="organ-btn" id="btn-tongue" data-organ="tongue" data-file="materials/tongue.txt">Tongue</button>
-    <button class="organ-btn" id="btn-heart" data-organ="heart" data-file="materials/heart.txt">Heart</button>
-    <button class="organ-btn" id="btn-vessel" data-organ="vessel" data-file="materials/vessel.txt">Blood Vessel</button>
-    <button class="organ-btn" id="btn-bone" data-organ="bone" data-file="materials/bone.txt">Bone</button>
-
-  </div><!-- /body-wrapper -->
-
-</div><!-- /main-container -->
+</div>
 
 <!-- ======================== MODAL ======================== -->
 <div id="modal-overlay">
@@ -389,51 +308,75 @@
 (function() {
 
   /* -------- References -------- */
-  const bodyWrapper   = document.getElementById('body-wrapper');
   const humanFigure   = document.getElementById('human-figure');
-  const linesSvg      = document.getElementById('lines-svg');
   const modalOverlay  = document.getElementById('modal-overlay');
-  const modalBox      = document.getElementById('modal-box');
   const modalTitle    = document.getElementById('modal-title');
   const modalContent  = document.getElementById('modal-content');
   const modalLoading  = document.getElementById('modal-loading');
   const modalClose    = document.getElementById('modal-close');
   const organButtons  = document.querySelectorAll('.organ-btn');
 
-  /* -------- Organ target positions (% of the human image) -------- */
-  /* These represent approximate locations on the human figure image */
+  /* -------- Organ target positions (% of the human image dimensions) -------- */
+  /* These point to locations ON the body image where the line endpoint/dot goes */
   const organTargets = {
-    brain:  { x: 0.50, y: 0.06 },
-    tongue: { x: 0.50, y: 0.13 },
-    heart:  { x: 0.47, y: 0.30 },
-    vessel: { x: 0.44, y: 0.42 },
-    bone:   { x: 0.55, y: 0.65 }
+    brain:  { x: 0.50, y: 0.07 },
+    tongue: { x: 0.42, y: 0.17 },
+    heart:  { x: 0.55, y: 0.35 },
+    vessel: { x: 0.45, y: 0.38 },
+    bone:   { x: 0.62, y: 0.55 }
   };
 
-  /* -------- Draw pointer lines from buttons to organ targets -------- */
-  function updateLines() {
-    const wrapperRect = bodyWrapper.getBoundingClientRect();
-    const imgRect     = humanFigure.getBoundingClientRect();
+  /*
+   * Button placement config:
+   * side: 'left' or 'right' — which side of the screen the button goes
+   * yPct: vertical position as % of viewport height (from the reference screenshot)
+   * margin: how far from the edge of the viewport (px)
+   */
+  const buttonLayout = {
+    brain:  { side: 'right', yPct: 0.11, margin: 60 },
+    tongue: { side: 'left',  yPct: 0.22, margin: 60 },
+    heart:  { side: 'right', yPct: 0.35, margin: 60 },
+    vessel: { side: 'left',  yPct: 0.48, margin: 60 },
+    bone:   { side: 'right', yPct: 0.63, margin: 60 }
+  };
 
-    /* Offset of the image within the wrapper */
-    const imgOffsetX = imgRect.left - wrapperRect.left;
-    const imgOffsetY = imgRect.top  - wrapperRect.top;
+  /* -------- Position buttons & draw lines -------- */
+  function updateAll() {
+    const imgRect = humanFigure.getBoundingClientRect();
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
 
     organButtons.forEach(function(btn) {
-      const organ = btn.dataset.organ;
+      const organ  = btn.dataset.organ;
+      const layout = buttonLayout[organ];
       const target = organTargets[organ];
-      if (!target) return;
+      if (!layout || !target) return;
 
-      /* Button center relative to wrapper */
+      /* Position button */
+      const btnH = btn.offsetHeight;
+      const btnW = btn.offsetWidth;
+      const topPx = vh * layout.yPct - btnH / 2;
+
+      btn.style.top = topPx + 'px';
+
+      if (layout.side === 'right') {
+        btn.style.right = layout.margin + 'px';
+        btn.style.left  = 'auto';
+      } else {
+        btn.style.left  = layout.margin + 'px';
+        btn.style.right = 'auto';
+      }
+
+      /* Button center for SVG line start */
       const btnRect = btn.getBoundingClientRect();
-      const bx = btnRect.left - wrapperRect.left + btnRect.width / 2;
-      const by = btnRect.top  - wrapperRect.top  + btnRect.height / 2;
+      const bx = btnRect.left + btnRect.width / 2;
+      const by = btnRect.top  + btnRect.height / 2;
 
-      /* Target point on the image relative to wrapper */
-      const tx = imgOffsetX + imgRect.width  * target.x;
-      const ty = imgOffsetY + imgRect.height * target.y;
+      /* Target point on image */
+      const tx = imgRect.left + imgRect.width  * target.x;
+      const ty = imgRect.top  + imgRect.height * target.y;
 
-      /* Update SVG line */
+      /* Update SVG */
       const line = document.getElementById('line-' + organ);
       const dot  = document.getElementById('dot-'  + organ);
 
@@ -450,38 +393,34 @@
     });
   }
 
-  /* -------- Initial draw & redraw on resize -------- */
-  function init() {
-    updateLines();
-  }
+  /* -------- Init -------- */
+  humanFigure.addEventListener('load', updateAll);
+  window.addEventListener('resize', updateAll);
+  window.addEventListener('load', updateAll);
+  if (humanFigure.complete) setTimeout(updateAll, 50);
 
-  humanFigure.addEventListener('load', init);
-  window.addEventListener('resize', updateLines);
-  window.addEventListener('load', init);
+  /* Periodic updates for late layout */
+  let ticks = 0;
+  const iv = setInterval(function() {
+    updateAll();
+    if (++ticks > 20) clearInterval(iv);
+  }, 200);
 
-  /* Fallback in case image is already cached */
-  if (humanFigure.complete) {
-    setTimeout(init, 50);
-  }
-
-  /* -------- Button Click → Open Modal with fetched text -------- */
+  /* -------- Button Click → Modal -------- */
   organButtons.forEach(function(btn) {
     btn.addEventListener('click', function() {
-      const organ   = btn.dataset.organ;
-      const file    = btn.dataset.file;
-      const title   = btn.textContent;
+      const file  = btn.dataset.file;
+      const title = btn.textContent;
 
-      /* Show modal */
       modalTitle.textContent   = title;
       modalContent.textContent = '';
       modalLoading.classList.add('show');
       modalOverlay.classList.add('active');
 
-      /* Fetch text file */
       fetch(file)
-        .then(function(response) {
-          if (!response.ok) throw new Error('File not found: ' + file);
-          return response.text();
+        .then(function(r) {
+          if (!r.ok) throw new Error('File not found: ' + file);
+          return r.text();
         })
         .then(function(text) {
           modalLoading.classList.remove('show');
@@ -498,27 +437,14 @@
   modalClose.addEventListener('click', function() {
     modalOverlay.classList.remove('active');
   });
-
   modalOverlay.addEventListener('click', function(e) {
-    if (e.target === modalOverlay) {
-      modalOverlay.classList.remove('active');
-    }
+    if (e.target === modalOverlay) modalOverlay.classList.remove('active');
   });
-
-  /* Close with Escape key */
   document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape' && modalOverlay.classList.contains('active')) {
       modalOverlay.classList.remove('active');
     }
   });
-
-  /* -------- Periodic line update to handle late layout shifts -------- */
-  let ticks = 0;
-  const interval = setInterval(function() {
-    updateLines();
-    ticks++;
-    if (ticks > 20) clearInterval(interval);
-  }, 200);
 
 })();
 </script>
