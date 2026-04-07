@@ -273,8 +273,7 @@
   /* ===========================================================
    *  DOT POSITIONS — viewport fractions from 1920x1080
    *
-   *  Brain:  slightly right & down from (755,175)
-   *          → (775, 190) → 775/1920=0.4036, 190/1080=0.1759
+   *  Brain:  (958, 226) → 958/1920=0.4990, 226/1080=0.2093
    *  Tongue: (853, 381) → 0.4443, 0.3528
    *  Heart:  (987, 738) → 0.5141, 0.6833
    *  Vessel: (915, 521) → 0.4766, 0.4824
@@ -282,7 +281,7 @@
    * =========================================================== */
 
   var dotPositions = {
-    brain:  { xPct: 0.4036, yPct: 0.1759 },
+    brain:  { xPct: 0.4990, yPct: 0.2093 },
     tongue: { xPct: 0.4443, yPct: 0.3528 },
     heart:  { xPct: 0.5141, yPct: 0.6833 },
     vessel: { xPct: 0.4766, yPct: 0.4824 },
@@ -290,20 +289,17 @@
   };
 
   /* ===========================================================
-   *  BUTTON POSITIONS
-   *  Bone moved to LEFT side
-   *  Brain stays right side
+   *  BUTTON POSITIONS — moved closer to the human body
    * =========================================================== */
 
   var buttonLayout = {
-    brain:  { side: 'right', yPct: 0.152, margin: 40 },
-    tongue: { side: 'left',  yPct: 0.300, margin: 20 },
-    heart:  { side: 'right', yPct: 0.500, margin: 40 },
-    vessel: { side: 'left',  yPct: 0.430, margin: 20 },
-    bone:   { side: 'left',  yPct: 0.680, margin: 20 }
+    brain:  { side: 'right', yPct: 0.152, margin: 260 },
+    tongue: { side: 'left',  yPct: 0.300, margin: 150 },
+    heart:  { side: 'right', yPct: 0.500, margin: 260 },
+    vessel: { side: 'left',  yPct: 0.430, margin: 150 },
+    bone:   { side: 'left',  yPct: 0.680, margin: 150 }
   };
 
-  /* -------- Core update -------- */
   function updateAll() {
     var vw = window.innerWidth;
     var vh = window.innerHeight;
