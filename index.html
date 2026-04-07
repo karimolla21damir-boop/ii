@@ -271,50 +271,54 @@
   var organButtons = document.querySelectorAll('.organ-btn');
 
   /* ===========================================================
-   *  PIXEL-PERFECT POSITIONS
-   *  Measured from 1920x1080 fullscreen image (no browser chrome)
+   *  YOUR EXACT COORDINATES from 1920x1080 fullscreen:
    *
-   *  Image body area: left~380, top~50, width~640, height~1000
+   *  Brain:   (755, 175)  — already confirmed correct
+   *  Tongue:  (853, 381)
+   *  Heart:   (987, 738)
+   *  Vessel:  (915, 521)
+   *  Bone:    (711, 740)
    *
-   *  Brain glow:    (755, 175) → img% (0.586, 0.125)
-   *  Tongue/mouth:  (640, 270) → img% (0.406, 0.220)
-   *  Heart glow:    (810, 590) → img% (0.672, 0.540)
-   *  Vessel (neck): (735, 370) → img% (0.555, 0.320)
-   *  Bone (shoulder):(960,460) → img% (0.906, 0.410)
+   *  These are ABSOLUTE screen pixels at 1920x1080.
+   *  We store them as viewport fractions so they scale.
+   *
+   *  brain:  755/1920=0.3932,  175/1080=0.1620
+   *  tongue: 853/1920=0.4443,  381/1080=0.3528
+   *  heart:  987/1920=0.5141,  738/1080=0.6833
+   *  vessel: 915/1920=0.4766,  521/1080=0.4824
+   *  bone:   711/1920=0.3703,  740/1080=0.6852
    * =========================================================== */
 
-  var organTargets = {
-    brain:  { x: 0.586, y: 0.125 },
-    tongue: { x: 0.406, y: 0.220 },
-    heart:  { x: 0.672, y: 0.540 },
-    vessel: { x: 0.555, y: 0.320 },
-    bone:   { x: 0.906, y: 0.410 }
+  var dotPositions = {
+    brain:  { xPct: 0.3932, yPct: 0.1620 },
+    tongue: { xPct: 0.4443, yPct: 0.3528 },
+    heart:  { xPct: 0.5141, yPct: 0.6833 },
+    vessel: { xPct: 0.4766, yPct: 0.4824 },
+    bone:   { xPct: 0.3703, yPct: 0.6852 }
   };
 
   /* ===========================================================
    *  BUTTON POSITIONS
-   *  Measured from 1920x1080 fullscreen screenshot
-   *  yPct = button center Y / 1080
    * =========================================================== */
 
   var buttonLayout = {
     brain:  { side: 'right', yPct: 0.152, margin: 40 },
-    tongue: { side: 'left',  yPct: 0.227, margin: 20 },
-    heart:  { side: 'right', yPct: 0.341, margin: 40 },
-    vessel: { side: 'left',  yPct: 0.416, margin: 20 },
-    bone:   { side: 'right', yPct: 0.530, margin: 40 }
+    tongue: { side: 'left',  yPct: 0.300, margin: 20 },
+    heart:  { side: 'right', yPct: 0.500, margin: 40 },
+    vessel: { side: 'left',  yPct: 0.430, margin: 20 },
+    bone:   { side: 'right', yPct: 0.680, margin: 40 }
   };
 
   /* -------- Core update -------- */
   function updateAll() {
-    var imgRect = humanFigure.getBoundingClientRect();
+    var vw = window.innerWidth;
     var vh = window.innerHeight;
 
     organButtons.forEach(function(btn) {
       var organ  = btn.dataset.organ;
       var layout = buttonLayout[organ];
-      var target = organTargets[organ];
-      if (!layout || !target) return;
+      var dotPos = dotPositions[organ];
+      if (!layout || !dotPos) return;
 
       /* Position button */
       var btnH = btn.offsetHeight;
@@ -329,15 +333,15 @@
         btn.style.right = 'auto';
       }
 
-      /* Line: from inner edge of button to organ dot */
+      /* Line start: inner edge of button */
       var btnRect = btn.getBoundingClientRect();
       var bx, by;
       by = btnRect.top + btnRect.height / 2;
       bx = (layout.side === 'right') ? btnRect.left : btnRect.right;
 
-      /* Organ dot: relative to image bounding box */
-      var tx = imgRect.left + imgRect.width  * target.x;
-      var ty = imgRect.top  + imgRect.height * target.y;
+      /* Dot position: direct viewport fraction */
+      var tx = vw * dotPos.xPct;
+      var ty = vh * dotPos.yPct;
 
       var line = document.getElementById('line-' + organ);
       var dot  = document.getElementById('dot-'  + organ);
