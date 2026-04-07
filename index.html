@@ -24,7 +24,7 @@
     position: fixed;
     top: 0; left: 0;
     width: 100%; height: 100%;
-    background: radial-gradient(ellipse at center, #0a1628 0%, #060d1a 40%, #020508 100%);
+    background: radial-gradient(ellipse at center, #1a3050 0%, #0f2040 30%, #0a1530 60%, #050d1a 100%);
     z-index: 0;
   }
 
@@ -34,7 +34,7 @@
     width: 100%; height: 100%;
     object-fit: cover;
     z-index: 1;
-    opacity: 0.3;
+    opacity: 0.5;
     pointer-events: none;
   }
 
@@ -269,16 +269,15 @@
   var modalLoading = document.getElementById('modal-loading');
   var modalClose   = document.getElementById('modal-close');
   var organButtons = document.querySelectorAll('.organ-btn');
+  var bgVideo      = document.getElementById('bg-video');
 
-  /* ===========================================================
-   *  DOT POSITIONS — viewport fractions from 1920x1080
-   *
-   *  Brain:  (958, 226) → 958/1920=0.4990, 226/1080=0.2093
-   *  Tongue: (853, 381) → 0.4443, 0.3528
-   *  Heart:  (987, 738) → 0.5141, 0.6833
-   *  Vessel: (915, 521) → 0.4766, 0.4824
-   *  Bone:   (711, 740) → 0.3703, 0.6852
-   * =========================================================== */
+  /* -------- Force video to loop at exactly 8 seconds -------- */
+  bgVideo.addEventListener('timeupdate', function() {
+    if (bgVideo.currentTime >= 8) {
+      bgVideo.currentTime = 0;
+      bgVideo.play();
+    }
+  });
 
   var dotPositions = {
     brain:  { xPct: 0.4990, yPct: 0.2093 },
@@ -287,10 +286,6 @@
     vessel: { xPct: 0.4766, yPct: 0.4824 },
     bone:   { xPct: 0.3703, yPct: 0.6852 }
   };
-
-  /* ===========================================================
-   *  BUTTON POSITIONS — moved closer to the human body
-   * =========================================================== */
 
   var buttonLayout = {
     brain:  { side: 'right', yPct: 0.152, margin: 260 },
