@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="kk">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -90,16 +90,16 @@
     border: 1px solid rgba(0, 180, 255, 0.45);
     color: #b0dcff;
     font-family: 'Orbitron', sans-serif;
-    font-size: 13px;
-    font-weight: 500;
-    letter-spacing: 1.2px;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
     text-transform: uppercase;
-    padding: 8px 20px;
-    border-radius: 4px;
+    padding: 12px 28px;
+    border-radius: 6px;
     cursor: pointer;
     white-space: nowrap;
     transition: all 0.3s ease;
-    box-shadow: 0 0 10px rgba(0, 150, 255, 0.15), inset 0 0 8px rgba(0, 150, 255, 0.05);
+    box-shadow: 0 0 12px rgba(0, 150, 255, 0.15), inset 0 0 10px rgba(0, 150, 255, 0.05);
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
   }
@@ -253,18 +253,18 @@
     <line id="line-bone"/><circle class="dot-end" id="dot-bone" r="5"/>
   </svg>
 
-  <button class="organ-btn" id="btn-brain"  data-organ="brain"  data-file="materials/brain.txt">Brain</button>
-  <button class="organ-btn" id="btn-tongue" data-organ="tongue" data-file="materials/tongue.txt">Tongue</button>
-  <button class="organ-btn" id="btn-heart"  data-organ="heart"  data-file="materials/heart.txt">Heart</button>
-  <button class="organ-btn" id="btn-vessel" data-organ="vessel" data-file="materials/vessel.txt">Blood Vessel</button>
-  <button class="organ-btn" id="btn-bone"   data-organ="bone"   data-file="materials/bone.txt">Bone</button>
+  <button class="organ-btn" id="btn-brain"  data-organ="brain"  data-file="materials/brain.txt">МИ</button>
+  <button class="organ-btn" id="btn-tongue" data-organ="tongue" data-file="materials/tongue.txt">ТІЛ</button>
+  <button class="organ-btn" id="btn-heart"  data-organ="heart"  data-file="materials/heart.txt">ЖҮРЕК</button>
+  <button class="organ-btn" id="btn-vessel" data-organ="vessel" data-file="materials/vessel.txt">ҚАН ТАМЫРЛАР</button>
+  <button class="organ-btn" id="btn-bone"   data-organ="bone"   data-file="materials/bone.txt">СҮЙЕК</button>
 </div>
 
 <div id="modal-overlay">
   <div id="modal-box">
     <button id="modal-close">&times;</button>
     <div id="modal-title"></div>
-    <div id="modal-loading"><div class="spinner"></div>Loading...</div>
+    <div id="modal-loading"><div class="spinner"></div>Жүктелуде...</div>
     <div id="modal-content"></div>
   </div>
 </div>
@@ -376,7 +376,7 @@
 
       fetch(file)
         .then(function(r) {
-          if (!r.ok) throw new Error('File not found: ' + file);
+          if (!r.ok) throw new Error('Файл табылмады: ' + file);
           return r.text();
         })
         .then(function(text) {
@@ -385,7 +385,7 @@
         })
         .catch(function(err) {
           modalLoading.classList.remove('show');
-          modalContent.textContent = 'Could not load content.\n' + err.message;
+          modalContent.textContent = 'Мазмұнды жүктеу мүмкін болмады.\n' + err.message;
         });
     });
   });
