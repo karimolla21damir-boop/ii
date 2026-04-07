@@ -5,6 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Human Body Interactive</title>
 
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
 <style>
   *, *::before, *::after {
     margin: 0;
@@ -24,7 +28,7 @@
     position: fixed;
     top: 0; left: 0;
     width: 100%; height: 100%;
-    background: radial-gradient(ellipse at center, #1a3050 0%, #0f2040 30%, #0a1530 60%, #050d1a 100%);
+    background: radial-gradient(ellipse at center, #254060 0%, #1a3355 25%, #122848 50%, #0c1e3a 75%, #081428 100%);
     z-index: 0;
   }
 
@@ -34,7 +38,7 @@
     width: 100%; height: 100%;
     object-fit: cover;
     z-index: 1;
-    opacity: 0.5;
+    opacity: 0.65;
     pointer-events: none;
   }
 
@@ -85,6 +89,7 @@
     background: rgba(0, 20, 50, 0.7);
     border: 1px solid rgba(0, 180, 255, 0.45);
     color: #b0dcff;
+    font-family: 'Orbitron', sans-serif;
     font-size: 13px;
     font-weight: 500;
     letter-spacing: 1.2px;
@@ -136,13 +141,13 @@
   #modal-box {
     background: linear-gradient(145deg, rgba(8, 25, 50, 0.95), rgba(4, 12, 30, 0.98));
     border: 1px solid rgba(0, 180, 255, 0.3);
-    border-radius: 10px;
-    width: 520px;
+    border-radius: 14px;
+    width: 750px;
     max-width: 90vw;
-    max-height: 70vh;
-    padding: 30px 35px;
+    max-height: 80vh;
+    padding: 40px 50px;
     position: relative;
-    box-shadow: 0 0 40px rgba(0, 120, 255, 0.15), 0 0 80px rgba(0, 80, 200, 0.08);
+    box-shadow: 0 0 50px rgba(0, 120, 255, 0.2), 0 0 100px rgba(0, 80, 200, 0.1);
     transform: translateY(20px) scale(0.97);
     transition: transform 0.4s ease;
     overflow-y: auto;
@@ -153,34 +158,38 @@
   }
 
   #modal-title {
-    font-size: 22px;
-    font-weight: 600;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
     color: #60c8ff;
-    margin-bottom: 18px;
+    margin-bottom: 22px;
     text-transform: uppercase;
-    letter-spacing: 2px;
-    text-shadow: 0 0 10px rgba(0, 180, 255, 0.3);
-    border-bottom: 1px solid rgba(0, 150, 255, 0.2);
-    padding-bottom: 12px;
+    letter-spacing: 3px;
+    text-shadow: 0 0 15px rgba(0, 180, 255, 0.4);
+    border-bottom: 1px solid rgba(0, 150, 255, 0.25);
+    padding-bottom: 16px;
   }
 
   #modal-content {
-    font-size: 15px;
-    line-height: 1.75;
-    color: #c0d8ee;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 19px;
+    font-weight: 400;
+    line-height: 1.85;
+    color: #c8ddf0;
     white-space: pre-wrap;
+    letter-spacing: 0.3px;
   }
 
   #modal-close {
     position: absolute;
-    top: 14px;
-    right: 16px;
+    top: 16px;
+    right: 18px;
     background: transparent;
     border: 1px solid rgba(0, 180, 255, 0.3);
     color: #80b8e0;
-    font-size: 18px;
-    width: 34px;
-    height: 34px;
+    font-size: 20px;
+    width: 38px;
+    height: 38px;
     border-radius: 50%;
     cursor: pointer;
     display: flex;
@@ -202,6 +211,7 @@
     text-align: center;
     padding: 20px;
     color: #5ab8e8;
+    font-family: 'Orbitron', sans-serif;
     font-size: 14px;
     letter-spacing: 1px;
   }
@@ -271,9 +281,9 @@
   var organButtons = document.querySelectorAll('.organ-btn');
   var bgVideo      = document.getElementById('bg-video');
 
-  /* -------- Force video to loop at exactly 8 seconds -------- */
+  /* Force video to loop at exactly 7.9 seconds */
   bgVideo.addEventListener('timeupdate', function() {
-    if (bgVideo.currentTime >= 8) {
+    if (bgVideo.currentTime >= 7.9) {
       bgVideo.currentTime = 0;
       bgVideo.play();
     }
