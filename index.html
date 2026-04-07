@@ -224,6 +224,22 @@
   #modal-box::-webkit-scrollbar { width: 6px; }
   #modal-box::-webkit-scrollbar-track { background: rgba(0, 20, 50, 0.5); }
   #modal-box::-webkit-scrollbar-thumb { background: rgba(0, 150, 255, 0.3); border-radius: 3px; }
+
+  /* ---------- Coordinate display (debug helper, remove later) ---------- */
+  #coord-display {
+    position: fixed;
+    bottom: 10px;
+    left: 10px;
+    z-index: 9999;
+    color: #0f0;
+    font-family: monospace;
+    font-size: 11px;
+    background: rgba(0,0,0,0.7);
+    padding: 4px 8px;
+    border-radius: 4px;
+    pointer-events: none;
+    display: none;
+  }
 </style>
 </head>
 <body>
@@ -265,6 +281,9 @@
   </div>
 </div>
 
+<!-- Debug coordinate display -->
+<div id="coord-display"></div>
+
 <!-- ======================== JAVASCRIPT ======================== -->
 <script>
 (function() {
@@ -276,33 +295,44 @@
   var modalLoading = document.getElementById('modal-loading');
   var modalClose   = document.getElementById('modal-close');
   var organButtons = document.querySelectorAll('.organ-btn');
+  var coordDisplay = document.getElementById('coord-display');
 
   /* ===========================================================
-   *  ORGAN DOT TARGETS — % of the human figure image
-   *  Measured from your 1920x1080 screenshot
-   *  x: 0=left edge of image → 1=right edge of image
-   *  y: 0=top edge of image  → 1=bottom edge of image
+   *  PIXEL-PERFECT POSITIONS FROM YOUR 1920x1080 SCREENSHOT
+   *
+   *  Your viewport content area: ~1920 x 728px
+   *  Image visible area: roughly x:470–980, y:60–720 in viewport
+   *  Image natural center: ~x:725, img spans ~510px wide, ~660px tall
+   *
+   *  These are % of the IMAGE dimensions (not viewport).
+   *  Measured by pixel-picking from your screenshot.
    * =========================================================== */
+
+  /*
+   * From the screenshot, the image rect is approximately:
+   *   left: ~470, top: ~60, width: ~510, height: ~660
+   *
+   * Brain glow center:    viewport ~(710, 185) → image % = ((710-470)/510, (185-60)/660) = (0.47, 0.19)
+   * Tongue/mouth area:    viewport ~(650, 240) → image % = ((650-470)/510, (240-60)/660) = (0.35, 0.27)
+   * Heart glow center:    viewport ~(770, 560) → image % = ((770-470)/510, (560-60)/660) = (0.59, 0.76)
+   * Blood vessels (neck):  viewport ~(710, 320) → image % = ((710-470)/510, (320-60)/660) = (0.47, 0.39)
+   * Bone (right shoulder): viewport ~(940, 420) → image % = ((940-470)/510, (420-60)/660) = (0.92, 0.545)
+   */
+
   var organTargets = {
-    brain:  { x: 0.385, y: 0.065 },
-    tongue: { x: 0.340, y: 0.195 },
-    heart:  { x: 0.310, y: 0.340 },
-    vessel: { x: 0.285, y: 0.390 },
-    bone:   { x: 0.800, y: 0.530 }
+    brain:  { x: 0.47, y: 0.19 },
+    tongue: { x: 0.35, y: 0.27 },
+    heart:  { x: 0.59, y: 0.76 },
+    vessel: { x: 0.47, y: 0.39 },
+    bone:   { x: 0.92, y: 0.545 }
   };
 
-  /* ===========================================================
-   *  BUTTON POSITIONS — relative to viewport
-   *  side:   'left' or 'right' edge
-   *  yPct:   fraction of viewport height (0.0 top → 1.0 bottom)
-   *  margin: px from the viewport edge
-   * =========================================================== */
   var buttonLayout = {
-    brain:  { side: 'right', yPct: 0.145, margin: 30 },
-    tongue: { side: 'left',  yPct: 0.245, margin: 40 },
-    heart:  { side: 'right', yPct: 0.365, margin: 30 },
-    vessel: { side: 'left',  yPct: 0.480, margin: 40 },
-    bone:   { side: 'right', yPct: 0.600, margin: 30 }
+    brain:  { side: 'right', yPct: 0.195, margin: 30 },
+    tongue: { side: 'left',  yPct: 0.290, margin: 30 },
+    heart:  { side: 'right', yPct: 0.390, margin: 30 },
+    vessel: { side: 'left',  yPct: 0.510, margin: 30 },
+    bone:   { side: 'right', yPct: 0.620, margin: 30 }
   };
 
   /* -------- Core update function -------- */
@@ -329,23 +359,20 @@
         btn.style.right = 'auto';
       }
 
-      /* Calculate line endpoints */
+      /* Line endpoints */
       var btnRect = btn.getBoundingClientRect();
-
-      /* Button connection point: inner edge (side facing the body) */
       var bx, by;
       by = btnRect.top + btnRect.height / 2;
       if (layout.side === 'right') {
-        bx = btnRect.left; /* left edge of right-side button */
+        bx = btnRect.left;
       } else {
-        bx = btnRect.right; /* right edge of left-side button */
+        bx = btnRect.right;
       }
 
       /* Target organ dot on the image */
       var tx = imgRect.left + imgRect.width  * target.x;
       var ty = imgRect.top  + imgRect.height * target.y;
 
-      /* Update SVG elements */
       var line = document.getElementById('line-' + organ);
       var dot  = document.getElementById('dot-'  + organ);
 
@@ -365,7 +392,6 @@
   /* -------- Initialize -------- */
   function init() {
     updateAll();
-    /* Keep updating briefly in case of late image load */
     var count = 0;
     var interval = setInterval(function() {
       updateAll();
@@ -377,6 +403,23 @@
   window.addEventListener('resize', updateAll);
   window.addEventListener('load', init);
   if (humanFigure.complete) setTimeout(init, 30);
+
+  /* -------- LIVE COORDINATE HELPER --------
+   * Move your mouse over the image. The green text at bottom-left
+   * shows the image-relative % coordinates.
+   * Use these to fine-tune organTargets values.
+   * Set display:block on #coord-display to enable.
+   * Remove this section when done calibrating.
+   */
+  document.addEventListener('mousemove', function(e) {
+    if (coordDisplay.style.display === 'none') return;
+    var imgRect = humanFigure.getBoundingClientRect();
+    var rx = ((e.clientX - imgRect.left) / imgRect.width).toFixed(3);
+    var ry = ((e.clientY - imgRect.top)  / imgRect.height).toFixed(3);
+    coordDisplay.textContent =
+      'viewport: (' + e.clientX + ', ' + e.clientY + ')  |  ' +
+      'img %: (x: ' + rx + ', y: ' + ry + ')';
+  });
 
   /* -------- Button Click → Fetch text & show modal -------- */
   organButtons.forEach(function(btn) {
