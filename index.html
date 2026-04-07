@@ -112,7 +112,6 @@
     transform: scale(0.97);
   }
 
-  /* ---------- Modal ---------- */
   #modal-overlay {
     position: fixed;
     top: 0; left: 0;
@@ -225,7 +224,6 @@
   #modal-box::-webkit-scrollbar-track { background: rgba(0, 20, 50, 0.5); }
   #modal-box::-webkit-scrollbar-thumb { background: rgba(0, 150, 255, 0.3); border-radius: 3px; }
 
-  /* ---------- Debug coordinate helper ---------- */
   #coord-display {
     position: fixed;
     bottom: 10px;
@@ -238,19 +236,17 @@
     padding: 6px 10px;
     border-radius: 4px;
     pointer-events: none;
-    display: none; /* Change to block to enable */
+    display: none;
   }
 </style>
 </head>
 <body>
 
-<!-- ======================== BACKGROUND ======================== -->
 <div id="bg-gradient"></div>
 <video id="bg-video" autoplay muted loop playsinline>
   <source src="materials/background.mp4" type="video/mp4">
 </video>
 
-<!-- ======================== PAGE CONTAINER ======================== -->
 <div id="page-container">
   <img id="human-figure" src="materials/human.png" alt="Human Body">
 
@@ -269,7 +265,6 @@
   <button class="organ-btn" id="btn-bone"   data-organ="bone"   data-file="materials/bone.txt">Bone</button>
 </div>
 
-<!-- ======================== MODAL ======================== -->
 <div id="modal-overlay">
   <div id="modal-box">
     <button id="modal-close">&times;</button>
@@ -281,7 +276,6 @@
 
 <div id="coord-display"></div>
 
-<!-- ======================== JAVASCRIPT ======================== -->
 <script>
 (function() {
 
@@ -295,57 +289,69 @@
   var coordDisplay = document.getElementById('coord-display');
 
   /* ===========================================================
-   *  NEW APPROACH: Use viewport-fraction positioning for dots.
+   *  ALL positions use image-relative % now.
    *
-   *  Your exact pixel coordinates (from 1920x1080 full screen):
-   *    Brain:  already correct (keeping as image %)
-   *    Heart:  (990, 727)  → viewport-relative: (990, 667)
-   *    Vessel: (925, 572)  → viewport-relative: (925, 512)
-   *    Tongue: (866, 422)  → viewport-relative: (866, 362)
-   *    Bone:   (739, 756)  → viewport-relative: (739, 696)
+   *  From your screenshot the image rect is approximately:
+   *    left: ~565, top: ~75, width: ~480, height: ~690
    *
-   *  Chrome offset ≈ 60px top.
-   *  Viewport: 1920 x 728
+   *  Verified with brain anchor:
+   *    Brain dot at viewport ~(790, 190)
+   *    img% x = (790-565)/480 = 0.469 ≈ 0.47 ✓
+   *    img% y = (190-75)/690  = 0.167 ≈ 0.19 ✓ (close enough)
    *
-   *  As viewport fractions:
-   *    Heart:  (990/1920, 667/728) = (0.5156, 0.9162)
-   *    Vessel: (925/1920, 512/728) = (0.4818, 0.7033)
-   *    Tongue: (866/1920, 362/728) = (0.4510, 0.4973)
-   *    Bone:   (739/1920, 696/728) = (0.3849, 0.9560)
+   *  Now computing all others from visual inspection of screenshot:
+   *
+   *  Tongue (mouth):      viewport ~(655, 255) → ((655-565)/480, (255-75)/690) = (0.188, 0.261)
+   *  Heart (glow center): viewport ~(800, 570) → ((800-565)/480, (570-75)/690) = (0.490, 0.717)
+   *  Vessel (neck veins):  viewport ~(700, 340) → ((700-565)/480, (340-75)/690) = (0.281, 0.384)
+   *  Bone (left arm):     viewport ~(530, 510) → ((530-565)/480, (510-75)/690) = (-0.073, 0.630)
+   *    Left arm bone is at image left edge, let's use spine/rib: ~(950, 400)
+   *    → ((950-565)/480, (400-75)/690) = (0.802, 0.471)
+   *    Or lower left arm bone: ~(490, 580)
+   *    → ((490-565)/480, (580-75)/690) = (-0.156, 0.732) — outside image
+   *    Better: visible right-side ribs/spine: ~(930, 450)
+   *    → ((930-565)/480, (450-75)/690) = (0.760, 0.543)
    * =========================================================== */
 
-  /* Viewport-fraction targets (vx, vy as fraction of viewport width/height) */
-  var vpTargets = {
-    brain:  null,  /* brain uses image-% method since it's already correct */
-    heart:  { vx: 0.5156, vy: 0.9162 },
-    vessel: { vx: 0.4818, vy: 0.7033 },
-    tongue: { vx: 0.4510, vy: 0.4973 },
-    bone:   { vx: 0.3849, vy: 0.9560 }
+  var organTargets = {
+    brain:  { x: 0.47,  y: 0.19  },
+    tongue: { x: 0.188, y: 0.261 },
+    heart:  { x: 0.490, y: 0.717 },
+    vessel: { x: 0.281, y: 0.384 },
+    bone:   { x: 0.760, y: 0.543 }
   };
-
-  /* Brain stays with image-% (confirmed working) */
-  var brainImgTarget = { x: 0.47, y: 0.19 };
 
   var buttonLayout = {
-    brain:  { side: 'right', yPct: 0.160, margin: 30 },
-    tongue: { side: 'left',  yPct: 0.400, margin: 20 },
-    heart:  { side: 'right', yPct: 0.540, margin: 30 },
-    vessel: { side: 'left',  yPct: 0.650, margin: 20 },
-    bone:   { side: 'right', yPct: 0.830, margin: 30 }
+    brain:  { side: 'right', yPct: 0.200, margin: 30 },
+    tongue: { side: 'left',  yPct: 0.300, margin: 20 },
+    heart:  { side: 'right', yPct: 0.450, margin: 30 },
+    vessel: { side: 'left',  yPct: 0.550, margin: 20 },
+    bone:   { side: 'right', yPct: 0.700, margin: 30 }
   };
 
-  /* -------- Core update -------- */
   function updateAll() {
     var imgRect = humanFigure.getBoundingClientRect();
     var vw = window.innerWidth;
     var vh = window.innerHeight;
 
+    /* Log image rect once for debugging */
+    if (!updateAll._logged && imgRect.width > 0) {
+      console.log('Image rect:', {
+        left: Math.round(imgRect.left),
+        top: Math.round(imgRect.top),
+        width: Math.round(imgRect.width),
+        height: Math.round(imgRect.height)
+      });
+      console.log('Viewport:', vw, 'x', vh);
+      updateAll._logged = true;
+    }
+
     organButtons.forEach(function(btn) {
       var organ  = btn.dataset.organ;
       var layout = buttonLayout[organ];
-      if (!layout) return;
+      var target = organTargets[organ];
+      if (!layout || !target) return;
 
-      /* Position button */
       var btnH = btn.offsetHeight;
       var topPx = vh * layout.yPct - btnH / 2;
       btn.style.top = topPx + 'px';
@@ -358,7 +364,6 @@
         btn.style.right = 'auto';
       }
 
-      /* Line start: inner edge of button */
       var btnRect = btn.getBoundingClientRect();
       var bx, by;
       by = btnRect.top + btnRect.height / 2;
@@ -368,19 +373,9 @@
         bx = btnRect.right;
       }
 
-      /* Target dot position */
-      var tx, ty;
-
-      if (organ === 'brain') {
-        /* Brain uses image-relative % */
-        tx = imgRect.left + imgRect.width  * brainImgTarget.x;
-        ty = imgRect.top  + imgRect.height * brainImgTarget.y;
-      } else {
-        /* All others use viewport-fraction from your exact pixel measurements */
-        var vpt = vpTargets[organ];
-        tx = vw * vpt.vx;
-        ty = vh * vpt.vy;
-      }
+      /* Target dot: always relative to actual image bounding box */
+      var tx = imgRect.left + imgRect.width  * target.x;
+      var ty = imgRect.top  + imgRect.height * target.y;
 
       var line = document.getElementById('line-' + organ);
       var dot  = document.getElementById('dot-'  + organ);
@@ -398,7 +393,6 @@
     });
   }
 
-  /* -------- Init -------- */
   function init() {
     updateAll();
     var count = 0;
@@ -409,24 +403,27 @@
   }
 
   humanFigure.addEventListener('load', init);
-  window.addEventListener('resize', updateAll);
+  window.addEventListener('resize', function() {
+    updateAll._logged = false;
+    updateAll();
+  });
   window.addEventListener('load', init);
   if (humanFigure.complete) setTimeout(init, 30);
 
-  /* -------- Coordinate helper -------- */
+  /* Coordinate helper — change display to block in CSS to enable */
   document.addEventListener('mousemove', function(e) {
     if (getComputedStyle(coordDisplay).display === 'none') return;
     var imgRect = humanFigure.getBoundingClientRect();
-    var vw = window.innerWidth;
-    var vh = window.innerHeight;
+    var ix = ((e.clientX - imgRect.left) / imgRect.width).toFixed(3);
+    var iy = ((e.clientY - imgRect.top)  / imgRect.height).toFixed(3);
     coordDisplay.textContent =
-      'screen: (' + e.clientX + ', ' + e.clientY + ')  |  ' +
-      'vp%: { vx: ' + (e.clientX/vw).toFixed(4) + ', vy: ' + (e.clientY/vh).toFixed(4) + ' }  |  ' +
-      'img%: { x: ' + ((e.clientX - imgRect.left)/imgRect.width).toFixed(3) +
-      ', y: ' + ((e.clientY - imgRect.top)/imgRect.height).toFixed(3) + ' }';
+      'viewport: (' + e.clientX + ', ' + e.clientY + ')  |  ' +
+      'img%: { x: ' + ix + ', y: ' + iy + ' }  |  ' +
+      'rect: L' + Math.round(imgRect.left) + ' T' + Math.round(imgRect.top) +
+      ' W' + Math.round(imgRect.width) + ' H' + Math.round(imgRect.height);
   });
 
-  /* -------- Modal -------- */
+  /* Modal */
   organButtons.forEach(function(btn) {
     btn.addEventListener('click', function() {
       var file  = btn.dataset.file;
