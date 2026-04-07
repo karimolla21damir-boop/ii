@@ -223,21 +223,6 @@
   #modal-box::-webkit-scrollbar { width: 6px; }
   #modal-box::-webkit-scrollbar-track { background: rgba(0, 20, 50, 0.5); }
   #modal-box::-webkit-scrollbar-thumb { background: rgba(0, 150, 255, 0.3); border-radius: 3px; }
-
-  #coord-display {
-    position: fixed;
-    bottom: 10px;
-    left: 10px;
-    z-index: 9999;
-    color: #0f0;
-    font-family: monospace;
-    font-size: 12px;
-    background: rgba(0,0,0,0.8);
-    padding: 6px 10px;
-    border-radius: 4px;
-    pointer-events: none;
-    display: none;
-  }
 </style>
 </head>
 <body>
@@ -274,8 +259,6 @@
   </div>
 </div>
 
-<div id="coord-display"></div>
-
 <script>
 (function() {
 
@@ -286,65 +269,46 @@
   var modalLoading = document.getElementById('modal-loading');
   var modalClose   = document.getElementById('modal-close');
   var organButtons = document.querySelectorAll('.organ-btn');
-  var coordDisplay = document.getElementById('coord-display');
 
   /* ===========================================================
-   *  ALL positions use image-relative % now.
+   *  PIXEL-PERFECT POSITIONS
+   *  Measured from 1920x1080 fullscreen image (no browser chrome)
    *
-   *  From your screenshot the image rect is approximately:
-   *    left: ~565, top: ~75, width: ~480, height: ~690
+   *  Image body area: left~380, top~50, width~640, height~1000
    *
-   *  Verified with brain anchor:
-   *    Brain dot at viewport ~(790, 190)
-   *    img% x = (790-565)/480 = 0.469 ≈ 0.47 ✓
-   *    img% y = (190-75)/690  = 0.167 ≈ 0.19 ✓ (close enough)
-   *
-   *  Now computing all others from visual inspection of screenshot:
-   *
-   *  Tongue (mouth):      viewport ~(655, 255) → ((655-565)/480, (255-75)/690) = (0.188, 0.261)
-   *  Heart (glow center): viewport ~(800, 570) → ((800-565)/480, (570-75)/690) = (0.490, 0.717)
-   *  Vessel (neck veins):  viewport ~(700, 340) → ((700-565)/480, (340-75)/690) = (0.281, 0.384)
-   *  Bone (left arm):     viewport ~(530, 510) → ((530-565)/480, (510-75)/690) = (-0.073, 0.630)
-   *    Left arm bone is at image left edge, let's use spine/rib: ~(950, 400)
-   *    → ((950-565)/480, (400-75)/690) = (0.802, 0.471)
-   *    Or lower left arm bone: ~(490, 580)
-   *    → ((490-565)/480, (580-75)/690) = (-0.156, 0.732) — outside image
-   *    Better: visible right-side ribs/spine: ~(930, 450)
-   *    → ((930-565)/480, (450-75)/690) = (0.760, 0.543)
+   *  Brain glow:    (755, 175) → img% (0.586, 0.125)
+   *  Tongue/mouth:  (640, 270) → img% (0.406, 0.220)
+   *  Heart glow:    (810, 590) → img% (0.672, 0.540)
+   *  Vessel (neck): (735, 370) → img% (0.555, 0.320)
+   *  Bone (shoulder):(960,460) → img% (0.906, 0.410)
    * =========================================================== */
 
   var organTargets = {
-    brain:  { x: 0.47,  y: 0.19  },
-    tongue: { x: 0.188, y: 0.261 },
-    heart:  { x: 0.490, y: 0.717 },
-    vessel: { x: 0.281, y: 0.384 },
-    bone:   { x: 0.760, y: 0.543 }
+    brain:  { x: 0.586, y: 0.125 },
+    tongue: { x: 0.406, y: 0.220 },
+    heart:  { x: 0.672, y: 0.540 },
+    vessel: { x: 0.555, y: 0.320 },
+    bone:   { x: 0.906, y: 0.410 }
   };
+
+  /* ===========================================================
+   *  BUTTON POSITIONS
+   *  Measured from 1920x1080 fullscreen screenshot
+   *  yPct = button center Y / 1080
+   * =========================================================== */
 
   var buttonLayout = {
-    brain:  { side: 'right', yPct: 0.200, margin: 30 },
-    tongue: { side: 'left',  yPct: 0.300, margin: 20 },
-    heart:  { side: 'right', yPct: 0.450, margin: 30 },
-    vessel: { side: 'left',  yPct: 0.550, margin: 20 },
-    bone:   { side: 'right', yPct: 0.700, margin: 30 }
+    brain:  { side: 'right', yPct: 0.152, margin: 40 },
+    tongue: { side: 'left',  yPct: 0.227, margin: 20 },
+    heart:  { side: 'right', yPct: 0.341, margin: 40 },
+    vessel: { side: 'left',  yPct: 0.416, margin: 20 },
+    bone:   { side: 'right', yPct: 0.530, margin: 40 }
   };
 
+  /* -------- Core update -------- */
   function updateAll() {
     var imgRect = humanFigure.getBoundingClientRect();
-    var vw = window.innerWidth;
     var vh = window.innerHeight;
-
-    /* Log image rect once for debugging */
-    if (!updateAll._logged && imgRect.width > 0) {
-      console.log('Image rect:', {
-        left: Math.round(imgRect.left),
-        top: Math.round(imgRect.top),
-        width: Math.round(imgRect.width),
-        height: Math.round(imgRect.height)
-      });
-      console.log('Viewport:', vw, 'x', vh);
-      updateAll._logged = true;
-    }
 
     organButtons.forEach(function(btn) {
       var organ  = btn.dataset.organ;
@@ -352,6 +316,7 @@
       var target = organTargets[organ];
       if (!layout || !target) return;
 
+      /* Position button */
       var btnH = btn.offsetHeight;
       var topPx = vh * layout.yPct - btnH / 2;
       btn.style.top = topPx + 'px';
@@ -364,16 +329,13 @@
         btn.style.right = 'auto';
       }
 
+      /* Line: from inner edge of button to organ dot */
       var btnRect = btn.getBoundingClientRect();
       var bx, by;
       by = btnRect.top + btnRect.height / 2;
-      if (layout.side === 'right') {
-        bx = btnRect.left;
-      } else {
-        bx = btnRect.right;
-      }
+      bx = (layout.side === 'right') ? btnRect.left : btnRect.right;
 
-      /* Target dot: always relative to actual image bounding box */
+      /* Organ dot: relative to image bounding box */
       var tx = imgRect.left + imgRect.width  * target.x;
       var ty = imgRect.top  + imgRect.height * target.y;
 
@@ -393,6 +355,7 @@
     });
   }
 
+  /* -------- Init -------- */
   function init() {
     updateAll();
     var count = 0;
@@ -403,27 +366,11 @@
   }
 
   humanFigure.addEventListener('load', init);
-  window.addEventListener('resize', function() {
-    updateAll._logged = false;
-    updateAll();
-  });
+  window.addEventListener('resize', updateAll);
   window.addEventListener('load', init);
   if (humanFigure.complete) setTimeout(init, 30);
 
-  /* Coordinate helper — change display to block in CSS to enable */
-  document.addEventListener('mousemove', function(e) {
-    if (getComputedStyle(coordDisplay).display === 'none') return;
-    var imgRect = humanFigure.getBoundingClientRect();
-    var ix = ((e.clientX - imgRect.left) / imgRect.width).toFixed(3);
-    var iy = ((e.clientY - imgRect.top)  / imgRect.height).toFixed(3);
-    coordDisplay.textContent =
-      'viewport: (' + e.clientX + ', ' + e.clientY + ')  |  ' +
-      'img%: { x: ' + ix + ', y: ' + iy + ' }  |  ' +
-      'rect: L' + Math.round(imgRect.left) + ' T' + Math.round(imgRect.top) +
-      ' W' + Math.round(imgRect.width) + ' H' + Math.round(imgRect.height);
-  });
-
-  /* Modal */
+  /* -------- Modal -------- */
   organButtons.forEach(function(btn) {
     btn.addEventListener('click', function() {
       var file  = btn.dataset.file;
