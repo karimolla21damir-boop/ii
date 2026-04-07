@@ -5,9 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Human Body Interactive</title>
 
-<!-- ======================== CSS ======================== -->
 <style>
-  /* ---------- Reset & Base ---------- */
   *, *::before, *::after {
     margin: 0;
     padding: 0;
@@ -22,7 +20,6 @@
     background: #000;
   }
 
-  /* ---------- Background Gradient ---------- */
   #bg-gradient {
     position: fixed;
     top: 0; left: 0;
@@ -31,7 +28,6 @@
     z-index: 0;
   }
 
-  /* ---------- Background Video ---------- */
   #bg-video {
     position: fixed;
     top: 0; left: 0;
@@ -42,7 +38,6 @@
     pointer-events: none;
   }
 
-  /* ---------- Full Page Container for buttons + lines ---------- */
   #page-container {
     position: fixed;
     top: 0; left: 0;
@@ -51,21 +46,20 @@
     overflow: hidden;
   }
 
-  /* ---------- Human Figure ---------- */
   #human-figure {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    height: 92vh;
+    height: 95vh;
     width: auto;
     object-fit: contain;
     display: block;
     filter: drop-shadow(0 0 30px rgba(0, 150, 255, 0.15));
     z-index: 2;
+    pointer-events: none;
   }
 
-  /* ---------- SVG Lines Layer ---------- */
   #lines-svg {
     position: absolute;
     top: 0; left: 0;
@@ -82,10 +76,9 @@
 
   #lines-svg circle.dot-end {
     fill: rgba(0, 200, 255, 0.8);
-    filter: drop-shadow(0 0 4px rgba(0, 200, 255, 0.9));
+    filter: drop-shadow(0 0 5px rgba(0, 200, 255, 0.9));
   }
 
-  /* ---------- Interactive Buttons ---------- */
   .organ-btn {
     position: absolute;
     z-index: 4;
@@ -94,13 +87,13 @@
     color: #b0dcff;
     font-size: 13px;
     font-weight: 500;
-    letter-spacing: 1px;
+    letter-spacing: 1.2px;
     text-transform: uppercase;
-    padding: 8px 18px;
+    padding: 8px 20px;
     border-radius: 4px;
     cursor: pointer;
     white-space: nowrap;
-    transition: all 0.35s ease;
+    transition: all 0.3s ease;
     box-shadow: 0 0 10px rgba(0, 150, 255, 0.15), inset 0 0 8px rgba(0, 150, 255, 0.05);
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
@@ -110,7 +103,7 @@
     background: rgba(0, 60, 120, 0.75);
     border-color: rgba(0, 210, 255, 0.8);
     color: #ffffff;
-    box-shadow: 0 0 20px rgba(0, 180, 255, 0.4), inset 0 0 12px rgba(0, 180, 255, 0.1);
+    box-shadow: 0 0 22px rgba(0, 180, 255, 0.4), inset 0 0 12px rgba(0, 180, 255, 0.1);
     transform: scale(1.07);
     text-shadow: 0 0 8px rgba(0, 200, 255, 0.6);
   }
@@ -119,7 +112,7 @@
     transform: scale(0.97);
   }
 
-  /* ---------- Modal Overlay ---------- */
+  /* ---------- Modal ---------- */
   #modal-overlay {
     position: fixed;
     top: 0; left: 0;
@@ -141,12 +134,11 @@
     visibility: visible;
   }
 
-  /* ---------- Modal Box ---------- */
   #modal-box {
     background: linear-gradient(145deg, rgba(8, 25, 50, 0.95), rgba(4, 12, 30, 0.98));
     border: 1px solid rgba(0, 180, 255, 0.3);
     border-radius: 10px;
-    width: 500px;
+    width: 520px;
     max-width: 90vw;
     max-height: 70vh;
     padding: 30px 35px;
@@ -206,7 +198,6 @@
     box-shadow: 0 0 12px rgba(0, 180, 255, 0.4);
   }
 
-  /* ---------- Loading Spinner ---------- */
   #modal-loading {
     display: none;
     text-align: center;
@@ -216,9 +207,7 @@
     letter-spacing: 1px;
   }
 
-  #modal-loading.show {
-    display: block;
-  }
+  #modal-loading.show { display: block; }
 
   #modal-loading .spinner {
     width: 30px;
@@ -230,64 +219,40 @@
     margin: 0 auto 10px;
   }
 
-  @keyframes spin {
-    to { transform: rotate(360deg); }
-  }
+  @keyframes spin { to { transform: rotate(360deg); } }
 
-  /* ---------- Scrollbar for modal ---------- */
-  #modal-box::-webkit-scrollbar {
-    width: 6px;
-  }
-  #modal-box::-webkit-scrollbar-track {
-    background: rgba(0, 20, 50, 0.5);
-  }
-  #modal-box::-webkit-scrollbar-thumb {
-    background: rgba(0, 150, 255, 0.3);
-    border-radius: 3px;
-  }
+  #modal-box::-webkit-scrollbar { width: 6px; }
+  #modal-box::-webkit-scrollbar-track { background: rgba(0, 20, 50, 0.5); }
+  #modal-box::-webkit-scrollbar-thumb { background: rgba(0, 150, 255, 0.3); border-radius: 3px; }
 </style>
 </head>
 <body>
 
-<!-- ======================== BACKGROUND GRADIENT ======================== -->
+<!-- ======================== BACKGROUND ======================== -->
 <div id="bg-gradient"></div>
-
-<!-- ======================== BACKGROUND VIDEO ======================== -->
 <video id="bg-video" autoplay muted loop playsinline>
   <source src="materials/background.mp4" type="video/mp4">
 </video>
 
 <!-- ======================== PAGE CONTAINER ======================== -->
 <div id="page-container">
-
-  <!-- Human Figure Image -->
   <img id="human-figure" src="materials/human.png" alt="Human Body">
 
-  <!-- SVG Lines connecting buttons to organ locations -->
+  <!-- SVG Lines -->
   <svg id="lines-svg" xmlns="http://www.w3.org/2000/svg">
-    <line id="line-brain" x1="0" y1="0" x2="0" y2="0"/>
-    <circle class="dot-end" id="dot-brain" cx="0" cy="0" r="4"/>
-
-    <line id="line-tongue" x1="0" y1="0" x2="0" y2="0"/>
-    <circle class="dot-end" id="dot-tongue" cx="0" cy="0" r="4"/>
-
-    <line id="line-heart" x1="0" y1="0" x2="0" y2="0"/>
-    <circle class="dot-end" id="dot-heart" cx="0" cy="0" r="4"/>
-
-    <line id="line-vessel" x1="0" y1="0" x2="0" y2="0"/>
-    <circle class="dot-end" id="dot-vessel" cx="0" cy="0" r="4"/>
-
-    <line id="line-bone" x1="0" y1="0" x2="0" y2="0"/>
-    <circle class="dot-end" id="dot-bone" cx="0" cy="0" r="4"/>
+    <line id="line-brain"/><circle class="dot-end" id="dot-brain" r="5"/>
+    <line id="line-tongue"/><circle class="dot-end" id="dot-tongue" r="5"/>
+    <line id="line-heart"/><circle class="dot-end" id="dot-heart" r="5"/>
+    <line id="line-vessel"/><circle class="dot-end" id="dot-vessel" r="5"/>
+    <line id="line-bone"/><circle class="dot-end" id="dot-bone" r="5"/>
   </svg>
 
-  <!-- Interactive Organ Buttons -->
-  <button class="organ-btn" id="btn-brain" data-organ="brain" data-file="materials/brain.txt">Brain</button>
+  <!-- Buttons -->
+  <button class="organ-btn" id="btn-brain"  data-organ="brain"  data-file="materials/brain.txt">Brain</button>
   <button class="organ-btn" id="btn-tongue" data-organ="tongue" data-file="materials/tongue.txt">Tongue</button>
-  <button class="organ-btn" id="btn-heart" data-organ="heart" data-file="materials/heart.txt">Heart</button>
+  <button class="organ-btn" id="btn-heart"  data-organ="heart"  data-file="materials/heart.txt">Heart</button>
   <button class="organ-btn" id="btn-vessel" data-organ="vessel" data-file="materials/vessel.txt">Blood Vessel</button>
-  <button class="organ-btn" id="btn-bone" data-organ="bone" data-file="materials/bone.txt">Bone</button>
-
+  <button class="organ-btn" id="btn-bone"   data-organ="bone"   data-file="materials/bone.txt">Bone</button>
 </div>
 
 <!-- ======================== MODAL ======================== -->
@@ -295,10 +260,7 @@
   <div id="modal-box">
     <button id="modal-close">&times;</button>
     <div id="modal-title"></div>
-    <div id="modal-loading">
-      <div class="spinner"></div>
-      Loading...
-    </div>
+    <div id="modal-loading"><div class="spinner"></div>Loading...</div>
     <div id="modal-content"></div>
   </div>
 </div>
@@ -307,56 +269,56 @@
 <script>
 (function() {
 
-  /* -------- References -------- */
-  const humanFigure   = document.getElementById('human-figure');
-  const modalOverlay  = document.getElementById('modal-overlay');
-  const modalTitle    = document.getElementById('modal-title');
-  const modalContent  = document.getElementById('modal-content');
-  const modalLoading  = document.getElementById('modal-loading');
-  const modalClose    = document.getElementById('modal-close');
-  const organButtons  = document.querySelectorAll('.organ-btn');
+  var humanFigure  = document.getElementById('human-figure');
+  var modalOverlay = document.getElementById('modal-overlay');
+  var modalTitle   = document.getElementById('modal-title');
+  var modalContent = document.getElementById('modal-content');
+  var modalLoading = document.getElementById('modal-loading');
+  var modalClose   = document.getElementById('modal-close');
+  var organButtons = document.querySelectorAll('.organ-btn');
 
-  /* -------- Organ target positions (% of the human image dimensions) -------- */
-  /* These point to locations ON the body image where the line endpoint/dot goes */
-  const organTargets = {
-    brain:  { x: 0.50, y: 0.07 },
-    tongue: { x: 0.42, y: 0.17 },
-    heart:  { x: 0.55, y: 0.35 },
-    vessel: { x: 0.45, y: 0.38 },
-    bone:   { x: 0.62, y: 0.55 }
+  /* ===========================================================
+   *  ORGAN DOT TARGETS — % of the human figure image
+   *  Measured from your 1920x1080 screenshot
+   *  x: 0=left edge of image → 1=right edge of image
+   *  y: 0=top edge of image  → 1=bottom edge of image
+   * =========================================================== */
+  var organTargets = {
+    brain:  { x: 0.385, y: 0.065 },
+    tongue: { x: 0.340, y: 0.195 },
+    heart:  { x: 0.310, y: 0.340 },
+    vessel: { x: 0.285, y: 0.390 },
+    bone:   { x: 0.800, y: 0.530 }
   };
 
-  /*
-   * Button placement config:
-   * side: 'left' or 'right' — which side of the screen the button goes
-   * yPct: vertical position as % of viewport height (from the reference screenshot)
-   * margin: how far from the edge of the viewport (px)
-   */
-  const buttonLayout = {
-    brain:  { side: 'right', yPct: 0.11, margin: 60 },
-    tongue: { side: 'left',  yPct: 0.22, margin: 60 },
-    heart:  { side: 'right', yPct: 0.35, margin: 60 },
-    vessel: { side: 'left',  yPct: 0.48, margin: 60 },
-    bone:   { side: 'right', yPct: 0.63, margin: 60 }
+  /* ===========================================================
+   *  BUTTON POSITIONS — relative to viewport
+   *  side:   'left' or 'right' edge
+   *  yPct:   fraction of viewport height (0.0 top → 1.0 bottom)
+   *  margin: px from the viewport edge
+   * =========================================================== */
+  var buttonLayout = {
+    brain:  { side: 'right', yPct: 0.145, margin: 30 },
+    tongue: { side: 'left',  yPct: 0.245, margin: 40 },
+    heart:  { side: 'right', yPct: 0.365, margin: 30 },
+    vessel: { side: 'left',  yPct: 0.480, margin: 40 },
+    bone:   { side: 'right', yPct: 0.600, margin: 30 }
   };
 
-  /* -------- Position buttons & draw lines -------- */
+  /* -------- Core update function -------- */
   function updateAll() {
-    const imgRect = humanFigure.getBoundingClientRect();
-    const vw = window.innerWidth;
-    const vh = window.innerHeight;
+    var imgRect = humanFigure.getBoundingClientRect();
+    var vh = window.innerHeight;
 
     organButtons.forEach(function(btn) {
-      const organ  = btn.dataset.organ;
-      const layout = buttonLayout[organ];
-      const target = organTargets[organ];
+      var organ  = btn.dataset.organ;
+      var layout = buttonLayout[organ];
+      var target = organTargets[organ];
       if (!layout || !target) return;
 
       /* Position button */
-      const btnH = btn.offsetHeight;
-      const btnW = btn.offsetWidth;
-      const topPx = vh * layout.yPct - btnH / 2;
-
+      var btnH = btn.offsetHeight;
+      var topPx = vh * layout.yPct - btnH / 2;
       btn.style.top = topPx + 'px';
 
       if (layout.side === 'right') {
@@ -367,18 +329,25 @@
         btn.style.right = 'auto';
       }
 
-      /* Button center for SVG line start */
-      const btnRect = btn.getBoundingClientRect();
-      const bx = btnRect.left + btnRect.width / 2;
-      const by = btnRect.top  + btnRect.height / 2;
+      /* Calculate line endpoints */
+      var btnRect = btn.getBoundingClientRect();
 
-      /* Target point on image */
-      const tx = imgRect.left + imgRect.width  * target.x;
-      const ty = imgRect.top  + imgRect.height * target.y;
+      /* Button connection point: inner edge (side facing the body) */
+      var bx, by;
+      by = btnRect.top + btnRect.height / 2;
+      if (layout.side === 'right') {
+        bx = btnRect.left; /* left edge of right-side button */
+      } else {
+        bx = btnRect.right; /* right edge of left-side button */
+      }
 
-      /* Update SVG */
-      const line = document.getElementById('line-' + organ);
-      const dot  = document.getElementById('dot-'  + organ);
+      /* Target organ dot on the image */
+      var tx = imgRect.left + imgRect.width  * target.x;
+      var ty = imgRect.top  + imgRect.height * target.y;
+
+      /* Update SVG elements */
+      var line = document.getElementById('line-' + organ);
+      var dot  = document.getElementById('dot-'  + organ);
 
       if (line) {
         line.setAttribute('x1', bx);
@@ -393,24 +362,27 @@
     });
   }
 
-  /* -------- Init -------- */
-  humanFigure.addEventListener('load', updateAll);
-  window.addEventListener('resize', updateAll);
-  window.addEventListener('load', updateAll);
-  if (humanFigure.complete) setTimeout(updateAll, 50);
-
-  /* Periodic updates for late layout */
-  let ticks = 0;
-  const iv = setInterval(function() {
+  /* -------- Initialize -------- */
+  function init() {
     updateAll();
-    if (++ticks > 20) clearInterval(iv);
-  }, 200);
+    /* Keep updating briefly in case of late image load */
+    var count = 0;
+    var interval = setInterval(function() {
+      updateAll();
+      if (++count > 30) clearInterval(interval);
+    }, 150);
+  }
 
-  /* -------- Button Click → Modal -------- */
+  humanFigure.addEventListener('load', init);
+  window.addEventListener('resize', updateAll);
+  window.addEventListener('load', init);
+  if (humanFigure.complete) setTimeout(init, 30);
+
+  /* -------- Button Click → Fetch text & show modal -------- */
   organButtons.forEach(function(btn) {
     btn.addEventListener('click', function() {
-      const file  = btn.dataset.file;
-      const title = btn.textContent;
+      var file  = btn.dataset.file;
+      var title = btn.textContent;
 
       modalTitle.textContent   = title;
       modalContent.textContent = '';
@@ -433,7 +405,7 @@
     });
   });
 
-  /* -------- Close Modal -------- */
+  /* -------- Close modal -------- */
   modalClose.addEventListener('click', function() {
     modalOverlay.classList.remove('active');
   });
@@ -441,9 +413,7 @@
     if (e.target === modalOverlay) modalOverlay.classList.remove('active');
   });
   document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape' && modalOverlay.classList.contains('active')) {
-      modalOverlay.classList.remove('active');
-    }
+    if (e.key === 'Escape') modalOverlay.classList.remove('active');
   });
 
 })();
