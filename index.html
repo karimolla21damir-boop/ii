@@ -306,15 +306,15 @@
 
   <svg id="lines-svg" xmlns="http://www.w3.org/2000/svg">
     <line id="line-brain"/><circle class="dot-end" id="dot-brain" r="5"/>
+    <line id="line-tongue"/><circle class="dot-end" id="dot-tongue" r="5"/>
     <line id="line-heart"/><circle class="dot-end" id="dot-heart" r="5"/>
     <line id="line-vessel"/><circle class="dot-end" id="dot-vessel" r="5"/>
-    <line id="line-bone"/><circle class="dot-end" id="dot-bone" r="5"/>
   </svg>
 
   <button class="organ-btn" id="btn-brain"  data-organ="brain"  data-file="materials/brain.txt">ТАРИХ — ҰЛТТЫҢ ЖАДЫ</button>
+  <button class="organ-btn" id="btn-tongue" data-organ="tongue" data-file="materials/tongue.txt">ЖҮРЕКТЕН ШЫҚҚАН ҮН</button>
   <button class="organ-btn" id="btn-heart"  data-organ="heart"  data-file="materials/heart.txt">ОТАНҒА ДЕГЕН СҮЙІСПЕНШІЛІК</button>
   <button class="organ-btn" id="btn-vessel" data-organ="vessel" data-file="materials/vessel.txt">МӘДЕНИЕТ ПЕН ДӘСТҮР</button>
-  <button class="organ-btn" id="btn-bone"   data-organ="bone"   data-file="materials/bone.txt">СҮЙЕК</button>
 </div>
 
 <div id="modal-overlay">
@@ -347,16 +347,16 @@
 
   var dotPositions = {
     brain:  { xPct: 0.4990, yPct: 0.2093 },
+    tongue: { xPct: 0.4443, yPct: 0.3528 },
     heart:  { xPct: 0.5141, yPct: 0.6833 },
-    vessel: { xPct: 0.4766, yPct: 0.4824 },
-    bone:   { xPct: 0.3703, yPct: 0.6852 }
+    vessel: { xPct: 0.4766, yPct: 0.4824 }
   };
 
   var buttonLayout = {
     brain:  { side: 'right', yPct: 0.152, margin: 200 },
-    heart:  { side: 'right', yPct: 0.460, margin: 200 },
-    vessel: { side: 'left',  yPct: 0.380, margin: 100 },
-    bone:   { side: 'left',  yPct: 0.620, margin: 100 }
+    tongue: { side: 'left',  yPct: 0.300, margin: 100 },
+    heart:  { side: 'right', yPct: 0.500, margin: 200 },
+    vessel: { side: 'left',  yPct: 0.450, margin: 100 }
   };
 
   function updateAll() {
